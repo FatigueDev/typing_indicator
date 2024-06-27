@@ -139,9 +139,12 @@ namespace TypingIndicator
             var configFilePath = $"{configPath}/config.json";
             var configOutOfDatePath = $"{configPath}/out_of_date_configs";
 
+            //Ensure directories.
+            Directory.CreateDirectory(configPath);
+            Directory.CreateDirectory(configOutOfDatePath);
+
             var currentVersion = api.ModLoader.GetMod("typing_indicator").Info.Version;
             Configuration? serverConfiguration = api.LoadModConfig<Configuration>(configFilePath);
-
 
             if(serverConfiguration != null)
             {
@@ -149,6 +152,7 @@ namespace TypingIndicator
                 if(savedVersion != currentVersion)
                 {
                     // api.StoreModConfig(JsonConvert.SerializeObject(serverConfiguration), $"{configOutOfDatePath}/config_{serverConfiguration.READONLY_CreatedWithTypingIndicatorVersion}.json");
+                    
                     File.Move(configFilePath, $"{configOutOfDatePath}/config_{serverConfiguration.READONLY_CreatedWithTypingIndicatorVersion}.json");
                     api.Logger.Error($"""
                     Typing Indicator has updated it's version and there may have been some changes to the JSON format of the configuration.
@@ -179,9 +183,15 @@ namespace TypingIndicator
 
         public void TryGetChatGUI(ICoreClientAPI clapi)
         {
-            ChatDialog = (from d in clapi.Gui.OpenedGuis where d.GetType() == typeof(HudDialogChat) select d).SingleOrDefault();
-            ChatInput = ChatDialog.Composers["chat"].GetChatInput("chatinput");
-            // ChatText = ChatInput.GetText();
+            var dialog = from d in clapi.Gui.OpenedGuis where d.GetType() == typeof(HudDialogChat) select d;
+            if(dialog != null)
+            {
+                var chatDialog = dialog.FirstOrDefault(defaultValue: null);
+                if(chatDialog == null) return;
+                
+                ChatDialog = chatDialog;
+                ChatInput = ChatDialog.Composers["chat"].GetChatInput("chatinput");
+            }
         }
 
         public override void OnGameTick(float deltaTime)

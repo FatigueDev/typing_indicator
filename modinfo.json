@@ -4,7 +4,7 @@
     name: "Typing Indicator",
     authors: ["Lila"],
     description: "An indicator for when someone is typing.",
-    version: "1.1.0",
+    version: "1.1.1",
     dependencies: {
         game: "1.19.8" // Will probably fuck me later. - Lila
     },
