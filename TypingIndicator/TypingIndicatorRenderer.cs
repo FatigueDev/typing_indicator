@@ -29,6 +29,9 @@ namespace TypingIndicator
 
         public LoadedTexture? texture;
 
+        public string DisplayText;
+        public int RenderDistance = 100;
+
         public EntityTypingIndicatorRenderer(ICoreClientAPI capi, Entity entity)
         {
             this.capi = capi;
@@ -37,11 +40,21 @@ namespace TypingIndicator
 
         public LoadedTexture? GenerateTypingTexture(ICoreClientAPI capi, Entity entity)
         {
-            if (entity.GetBehavior<EntityBehaviorTypingIndicator>().IsTyping)
+            var indicator = entity.GetBehavior<EntityBehaviorTypingIndicator>();
+
+            if(indicator.ServerConfigUpdated)
+            {
+                DisplayText = indicator.TypingIndicatorText;
+                RenderDistance = indicator.RenderRange;
+                indicator.ServerConfigUpdated = false;
+                // return texture = capi.Gui.TextTexture.GenUnscaledTextTexture(DisplayText, CairoFont.WhiteSmallText().WithColor(color), background);
+            }
+
+            if (indicator.IsTyping)
             {
                 if(texture == null)
                 {
-                    return texture = capi.Gui.TextTexture.GenUnscaledTextTexture("Typing...", CairoFont.WhiteSmallText().WithColor(color), background);
+                    return texture = capi.Gui.TextTexture.GenUnscaledTextTexture(DisplayText, CairoFont.WhiteSmallText().WithColor(color), background);
                 }
                 return texture;
             }
@@ -79,9 +92,11 @@ namespace TypingIndicator
                 }
             }
 
+            LoadedTexture? tex = GenerateTypingTexture(capi, obj);
+
             double dist = entityPlayer.Pos.SquareDistanceTo(entity.Pos);
 
-            if(dist > RenderRange) return;
+            if(dist > RenderDistance) return;
 
             double offX = entity.SelectionBox.X2 - entity.OriginSelectionBox.X2;
             double offZ = entity.SelectionBox.Z2 - entity.OriginSelectionBox.Z2;
@@ -90,7 +105,6 @@ namespace TypingIndicator
 
             if (pos.Z < 0.0) return;
 
-            LoadedTexture? tex = GenerateTypingTexture(capi, obj);
 
             if (tex != null)
             {

@@ -1,6 +1,6 @@
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.Client.NoObf;
+using Vintagestory.API.Server;
 
 namespace TypingIndicator
 {
@@ -8,10 +8,11 @@ namespace TypingIndicator
     {
         ICoreClientAPI? capi;
 
+        // Dictionary<string, string> typingIndicatorLocalizations;
+
         public override void Start(ICoreAPI api)
         {
             api.RegisterEntityBehaviorClass("typingindicator", typeof(EntityBehaviorTypingIndicator));
-
             base.Start(api);
         }
 
@@ -21,35 +22,17 @@ namespace TypingIndicator
 
             api.Event.PlayerEntitySpawn += (player) =>
             {
-                if(api.Side != EnumAppSide.Client) return;
-
                 player.Entity.AddBehavior(new EntityBehaviorTypingIndicator(player.Entity));
                 api.Event.RegisterRenderer(new EntityTypingIndicatorRenderer(api, player.Entity), EnumRenderStage.Ortho);
-
-                api.Event.RegisterGameTickListener((dt) =>
-                {
-                    if(player == api.World.Player)
-                    {
-                        var openedDialogs = from g in api.Gui.OpenedGuis select g;
-                        var hudDialogChat = (from d in openedDialogs where d.GetType() == typeof(HudDialogChat) select d).SingleOrDefault();
-
-                        if(hudDialogChat == null) return;
-
-                        var chatInput = hudDialogChat.Composers["chat"].GetChatInput("chatinput");
-
-                        if(chatInput.HasFocus && !string.IsNullOrEmpty(chatInput.GetText()))
-                        {
-                            player.Entity.GetBehavior<EntityBehaviorTypingIndicator>().SetTyping(true);
-                        }
-                        else
-                        {
-                            player.Entity.GetBehavior<EntityBehaviorTypingIndicator>().SetTyping(false);
-                        }
-                    }                    
-                }, 1000);
+                api.Network.SendEntityPacket(player.Entity.EntityId, (int)PACKET_ID.PacketID_RequestServerConfig, null);
             };
 
             base.StartClientSide(api);
+        }
+
+        public override void StartServerSide(ICoreServerAPI api)
+        {
+            base.StartServerSide(api);
         }
     }
 }

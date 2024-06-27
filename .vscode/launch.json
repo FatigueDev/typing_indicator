@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+      "name": "Launch Client",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build (Debug)",
+      "program": "${env:VINTAGE_STORY}/Vintagestory",
+      "args": [
+        "--playStyle" , "creativebuilding",
+        "--openWorld" , "Debugging",
+        "--addModPath", "${workspaceFolder}/TypingIndicator/bin/Debug/",
+        "--addOrigin" , "${workspaceFolder}/assets",
+      ],
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+    }]
+  }

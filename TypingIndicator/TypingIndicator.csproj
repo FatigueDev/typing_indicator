@@ -5,6 +5,8 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin/Debug/$(AssemblyName)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,25 +19,27 @@
       <Private>false</Private>
     </Reference>
     <Reference Include="ProtoBuf">
+      <HintPath>$(VINTAGE_STORY)/Lib/Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ProtoBuf">
       <HintPath>$(VINTAGE_STORY)/Lib/protobuf-net.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
+    <AssetsSourceFiles Include="../assets/**/*.*"/>
+  </ItemGroup>
+
+  <Target Name="CopyAssets" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(AssetsSourceFiles)" DestinationFolder="$(OutDir)assets/%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
     <Content Include="../modinfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
-  <ItemGroup>
-    <CompiledModFolder Include="./bin/**/*.*"/>
-  </ItemGroup>
-
-  <Target Name="CopyBuildToModDirectory" AfterTargets="AfterBuild">
-    <Copy SourceFiles="@(CompiledModFolder)" DestinationFolder="$(TYPING_INDICATOR_MOD_FOLDER)" />
-  </Target>
-
-  
 
 </Project>
