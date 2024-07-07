@@ -18,7 +18,7 @@ namespace TypingIndicator
         {
             get
             {
-               return entity.WatchedAttributes.GetTreeAttribute(PropertyName()).GetBool("typing", false);
+                return entity.WatchedAttributes.GetTreeAttribute(PropertyName()).GetBool("typing", false);
             }
             set
             {
@@ -26,7 +26,7 @@ namespace TypingIndicator
             }
         }
 
-        public string TypingIndicatorText = "Contact Lila (Fatigue) because the networking is fucked.";
+        public string TypingIndicatorText = new Configuration().Localizations["en"];
 
         public string ChatText;
 
